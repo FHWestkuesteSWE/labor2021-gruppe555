@@ -1,0 +1,22 @@
+Kurzbeschreibung:
+
+Protokoll zur Kommunikation der Teilnehmer
+
+Priorität:
+must 
+
+Abschätzung 
+1 Tag
+
+Details:
+
+Nachrichtenformat 1
+Messagetype	Länge RaumID SensorID Wert	Checksum
+				  int32	 int32	  int32	int32
+			Länge Payload				Checksum
+int8		int16 int32[]				int32
+
+					
+
+
+

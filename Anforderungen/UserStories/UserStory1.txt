@@ -1,0 +1,21 @@
+Kurzbeschreibung:
+
+Der Nutzer kann die Temperatur ändern.
+
+Priorität:
+must 
+
+Abschätzung 
+1 Tag
+
+Details:
+
+Der Nutzer kann die Temperatur über die Konsole ändern. Der Raum(e) muss vom Nutzer spezifieziert werden.
+Die Anfrage wird in einen Server verarbeitet und an den Thermostaten verschickt
+
+Fehlermöglichkeiten
+ - Server nicht erreichbar -> Fehlermeldung am Client
+ - Thermostat nicht erreichbar -> Fehlermeldung am Client und Server
+ - Raum ohne Thermostat -> Fehlermeldung am Client und Server
+ - Thermostatdefekt -> Fehlermeldung am Client und Server
+
