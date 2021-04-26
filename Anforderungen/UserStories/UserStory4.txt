@@ -1,0 +1,15 @@
+Kurzbeschreibung
+
+Server führt Logdaten der einzelnen Räume.
+
+Prio
+must
+
+Abschätzung 
+1 Tag
+
+Details:
+
+Logdaten in Ordnern für Räume und eigenen Dateien für die Sensoren. 
+Dateiname -> SensorID
+[Zeitstempel]([Aktion][Wert])/([Errors])

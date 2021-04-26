@@ -9,14 +9,15 @@ Abschätzung
 1 Tag
 
 Details:
+TCP/IP
 
 Nachrichtenformat 1
 Messagetype	Länge RaumID SensorID Wert	Checksum
 				  int32	 int32	  int32	int32
 			Länge Payload				Checksum
-int8		int16 int32[]				int32
+int8		int32 int8[]				int32
 
-					
+			
 
 
 

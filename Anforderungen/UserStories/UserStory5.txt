@@ -1,0 +1,12 @@
+Kurzbeschreibung:
+
+Server liest Konfigurationsdatei ein
+
+Prio
+could
+
+Abschätzung 
+1 Tag
+
+Details:
+?
