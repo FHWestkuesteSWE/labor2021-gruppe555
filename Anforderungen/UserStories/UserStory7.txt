@@ -1,0 +1,12 @@
+Kurzbeschreibung
+
+Das System muss im Fehlerfall die fehlerhafte Komponente neu initialisieren. 
+
+Prio
+must
+
+Abschätzung 
+1 Tag
+
+Details:
+

@@ -1,0 +1,14 @@
+Kurzbeschreibung
+
+Der Nutzer bekommt innerhalb einer Sekunde eine Antwort.
+
+Prio
+must
+
+Abschätzung 
+1 Tag
+
+Details:
+
+Falls die Antwort nicht zeitnah möglich sein sollte, wird eine 
+visuelle Ausgabe des Arbeitsfortschritts gegeben.
