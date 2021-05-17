@@ -2,13 +2,16 @@
 //
 
 #include <iostream>
-#include "Client.h"
+#include "BasicClient.h"
 
 using namespace std;
 int main(int argc, char* argv[])
 {
-    Client c(argv[1], argv[2]);
-    char req[1024];
+    char ip[] = "127.0.0.1";
+    char port[] = "5000";
+
+    BasicClient c(ip, port);
+    char req[1024] = "Hallo Welt";
     char ans[1024];
     char wahl;
     do {

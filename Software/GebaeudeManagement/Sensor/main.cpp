@@ -7,10 +7,11 @@ int main(int argc, char* argv[]) {
 		port = 5000;
 	}
 	else {
-		port = atoi(argv[1]); // Funktioniert noch nicht
+		//port = atoi(argv[1]); // Funktioniert noch nicht
 	}
 
-	BasicServer s;
+	Sensoren 
+	Sensor s;
 	//blablablabla
 	s.start(port);
 	return 0;
