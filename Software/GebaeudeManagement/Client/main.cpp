@@ -2,12 +2,16 @@
 //
 
 #include <iostream>
-#include "Client.h"
+#include "BasicClient.h"
 
 using namespace std;
 int main(int argc, char* argv[])
 {
-    Client c(argv[1], argv[2]);
+
+    char port[] = "5000";
+    char ip[] = "127.0.0.1";
+    //BasicClient c(argv[1], argv[2]);
+    BasicClient c(ip,port);
     char req[1024];
     char ans[1024];
     char wahl;
@@ -24,8 +28,9 @@ int main(int argc, char* argv[])
         cin >> wahl;
         switch (wahl) {
         case 't': // req zusammenbauen
-            c.sendRequest(req, ans);
-            cout << ans;
+            
+            c.sendRequest("test", ans);
+            cout << ans << "\n";
             break;
         default:;
 
