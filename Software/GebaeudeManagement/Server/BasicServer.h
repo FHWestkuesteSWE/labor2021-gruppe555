@@ -20,7 +20,8 @@ public:
 
 private:
 	void session(socket_ptr sock);
-	virtual void processRequest(char request[], char answer[]);
+	virtual void processRequest(char request[], char answer[], socket_ptr sock);
+	virtual void send_log_file(const char log_file_path[], socket_ptr sock);
 
 	std::vector<Raum> vec_raum;
 };

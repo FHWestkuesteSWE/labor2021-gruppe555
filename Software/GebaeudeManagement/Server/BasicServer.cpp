@@ -23,7 +23,7 @@ void BasicServer::session(socket_ptr sock)
 				break; // Connection closed cleanly by peer.
 			else if (error)
 				throw boost::system::system_error(error); // Some other error.
-			this->processRequest(request,answer);
+			this->processRequest(request,answer, sock);
 			boost::asio::write(*sock, boost::asio::buffer(boost::asio::buffer(answer), max_length));
 		}
 	}
@@ -51,7 +51,7 @@ void BasicServer::start(int port) {
 	}
 }
 
-void BasicServer::processRequest(char req[], char ans[]) {
+void BasicServer::processRequest(char req[], char ans[], socket_ptr sock) {
 	std::string reply;
 	unsigned int raum_id = 0, object_type = 0, object_id = 0;
 	float wert = 0.0f;
@@ -158,11 +158,27 @@ void BasicServer::processRequest(char req[], char ans[]) {
 	case 'e': //Error from Client?
 		break;
 	case 'l': //Log Daten ausgeben
-		break;
+		{std::string pfad = "logRaum" + req[1] + req[2] + req[3];
+		pfad += ".txt";
+		send_log_file(pfad.c_str(), sock);
+		break; }
 	default:
 		reply = "eDatenmuell erhalten!";
 	}
 	strncpy(ans, reply.c_str(), std::min<int>(max_length, reply.size() + 1));
+}
+
+void BasicServer::send_log_file(const char log_file_path[], socket_ptr sock)
+{
+	std::ifstream f(log_file_path, std::ios::in | std::ios::binary);
+	if (!f.is_open()) {
+		std::cout << "LogFile not found: " << log_file_path << " \n";
+		return;
+	}
+	std::string line;
+	while (std::getline(f, line)) {
+		boost::asio::write(*sock, boost::asio::buffer(boost::asio::buffer(_strdup(line.c_str()), max_length)));
+	}
 }
 
 BasicServer::~BasicServer()
