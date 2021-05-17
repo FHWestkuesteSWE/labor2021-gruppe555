@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <fstream>
 #include <list>
+#include <ctime>
 
 void BasicServer::session(socket_ptr sock)
 {
@@ -57,6 +58,10 @@ void BasicServer::processRequest(char req[], char ans[]) {
 	std::string raum_id_txt, object_type_txt, object_id_txt;
 	std::string wert1, wert2;
 
+	time_t rawtime;
+	time(&rawtime);
+	std::string zeitstempel = asctime(localtime(&rawtime));
+
 	if (req[0] == 'w' || req[0] == 'r') {
 		raum_id_txt = req[1] + req[2] + req[3];
 		object_type_txt = req[4] + req[5];
@@ -91,8 +96,19 @@ void BasicServer::processRequest(char req[], char ans[]) {
 				reply = "eAktor konnte nicht gefunden werden.";  break;
 			}
 
-			if (vec_raum[raum_id-1].aktoren[i].set_aktor_value(wert)) reply = "mAktorwert erfolgreich gesetzt.";
-			else reply =  "eAktorwert konnte nicht gesetzt werden.";
+			std::string logmsg = zeitstempel + " " + req[0] + " " + raum_id_txt + " " + object_type_txt
+				+ " " + object_id_txt + " " + wert1 + "." + wert2;
+			std::ofstream f("logRaum" + raum_id_txt + ".txt");
+
+			if (vec_raum[raum_id - 1].aktoren[i].set_aktor_value(wert)) {
+				reply = "mAktorwert erfolgreich gesetzt.";
+			}
+			else {
+				reply = "eAktorwert konnte nicht gesetzt werden.";
+				logmsg += " Error: no exec";
+			}
+			f.write(logmsg.c_str(), logmsg.size());
+			f.close();
 		} 
 		else {
 			reply = "eRaum nicht vorhanden.";
@@ -114,6 +130,10 @@ void BasicServer::processRequest(char req[], char ans[]) {
 			float value = vec_raum[raum_id-1].sensoren[i].get_sensor_value();
 			char value_txt[5];
 
+			std::string logmsg = zeitstempel + " " + req[0] + " " + raum_id_txt + " " + object_type_txt
+				+ " " + object_id_txt + " ";
+			std::ofstream f("logRaum" + raum_id_txt + ".txt");
+
 			if(isfinite(value)) {
 				value_txt[0] = (int)floor((floor(value) / 10.0f)) + 48;
 				value_txt[1] = ((int)floor(value) % 10) + 48;
@@ -122,8 +142,14 @@ void BasicServer::processRequest(char req[], char ans[]) {
 				value_txt[4] = '\0';
 
 				reply = "w" + raum_id_txt + object_type_txt + object_id_txt + value_txt;
+				logmsg += value_txt[0] + value_txt[1] + "." + value_txt[2] + value_txt[3];
 			}
-			else reply = "eSensorwert konnte nicht gelesen werden.";
+			else {
+				reply = "eSensorwert konnte nicht gelesen werden.";
+				logmsg += "Error: non valid Value.";
+			}
+			f.write(logmsg.c_str(), logmsg.size());
+			f.close();
 		}
 		else {
 			reply = "eRaum nicht vorhanden.";
@@ -176,6 +202,7 @@ bool BasicServer::read_config(char path[])
 	catch(std::exception e) {
 		std::cout << "Error in Config-File!" << std::endl;
 	}
+	f.close();
 
 	std::vector<unsigned int> vec_data(list_data.size());
 	this->vec_raum.resize(list_data.size() / 3);
@@ -183,6 +210,28 @@ bool BasicServer::read_config(char path[])
 	for (auto list_it : list_data) vec_data[cnt++] = list_it;
 	for (int vec_it = 0; vec_it < vec_data.size() / 3; vec_it++) {
 		this->vec_raum[vec_it] = Raum(vec_data[3 * vec_it], vec_data[3 * vec_it + 1], vec_data[3 * vec_it + 2]);
+	}
+
+	//Log Dateien erstellen
+	FILE* fp;
+	char filestring[] = "logRaum";
+	std::string raum_id_txt;
+	std::string raum_pfad;
+
+	for (int i = 0; i < this->vec_raum.size(); i++) {
+		raum_id_txt = vec_raum[i].get_raum_id() / 100 + 48;
+		raum_id_txt += (vec_raum[i].get_raum_id() / 10) % 10 + 48;
+		raum_id_txt += vec_raum[i].get_raum_id() % 10 + 48;
+		raum_pfad = filestring + raum_id_txt + ".txt";
+		std::ifstream f(raum_pfad, std::ios::in | std::ios::binary);
+		if (!f.is_open()) {
+			fp = fopen(raum_pfad.c_str(), "w");
+			fprintf(fp, "Zeitstempel // OPCode // Raum_Idx // Sensor_Type // Sensor_Idx // Value \n");
+			fclose(fp);
+		}
+		else {
+			f.close();
+		}
 	}
 	
 	return true;

@@ -13,3 +13,8 @@ Raum::Raum(unsigned int raum_id, unsigned int num_aktoren, unsigned int num_sens
 Raum::~Raum()
 {
 }
+
+int Raum::get_raum_id()
+{
+	return this->raum_id;
+}
