@@ -1,25 +1,22 @@
 #include "DummySensor.h"
 #include <random>
 
-int DummySensor::readValue() {
-	
+float DummySensor::get_sensor_value() 
+{
 	return g1();
-
 }
 
-DummySensor::DummySensor(int seed) {
+unsigned int DummySensor::get_sensor_type()
+{
+	return this->sensor_type;
+}
 
+DummySensor::DummySensor(enumSensorTypes type, int seed)
+{
+	this->sensor_type = type;
 	g1.seed(seed);
-
 }
 
-DummySensor::DummySensor() {
-
-	g1.seed(11);
-
-}
-
-DummySensor::~DummySensor() {
-
-
+DummySensor::~DummySensor()
+{
 }

@@ -1,17 +1,19 @@
 #include <random>
 
+typedef unsigned int enumSensorTypes;
+enum SensorTypes {Unbekannt = 0x00, TempSensor = 0x01, FensterKontakt = 0x02};
+
 class DummySensor {
 
 public:
-	int readValue(void);
-
-
-
-	DummySensor(int);
-	DummySensor();
+	DummySensor(enumSensorTypes type = 0, int seed = 11);
 	~DummySensor();
 
+	float get_sensor_value(void);
+	unsigned int get_sensor_type();
+
 private:
+	unsigned int sensor_type = 0;
 	std::minstd_rand0 g1;
 
 };
