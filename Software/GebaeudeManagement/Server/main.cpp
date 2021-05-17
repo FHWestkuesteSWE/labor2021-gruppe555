@@ -1,4 +1,6 @@
 #include "BasicServer.h"
+#include "DummySensor.h"
+#include <iostream>
 
 int main(int argc, char* argv[]) {
 
