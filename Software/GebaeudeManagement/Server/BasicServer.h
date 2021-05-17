@@ -10,7 +10,7 @@ typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
 class BasicServer
 {
 public:
-	void start(char port[]);
+	void start(int port);
 	BasicServer();
 	~BasicServer();
 	const static int max_length=1024;

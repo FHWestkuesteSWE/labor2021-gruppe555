@@ -34,12 +34,12 @@ BasicServer::BasicServer()
 
 }
 
-void BasicServer::start(char port[]) {
+void BasicServer::start(int port) {
 	boost::asio::io_service io_service;
 
 	using namespace std; // For atoi.
 	using boost::asio::ip::tcp;
-	tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), atoi(port)));
+	tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), port));
 	for (;;)
 	{
 		socket_ptr sock(new tcp::socket(io_service));

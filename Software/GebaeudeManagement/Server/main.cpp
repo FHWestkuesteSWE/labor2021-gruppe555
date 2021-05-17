@@ -1,10 +1,18 @@
-#include "Server.h"
+#include "BasicServer.h"
 
 int main(int argc, char* argv[]) {
 	//Ich bin ein Testpush
-	Server s;
+	int port;
+	if (argc == 0) {
+		port = 5000;
+	}
+	else {
+		port = atoi(argv[1]); // Funktioniert noch nicht
+	}
+
+	BasicServer s;
 	//blablablabla
-	s.start(argv[1]);
+	s.start(port);
 	return 0;
 }
 
