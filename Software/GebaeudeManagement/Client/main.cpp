@@ -1,17 +1,15 @@
-// main.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
-//
-
 #include <iostream>
 #include "BasicClient.h"
 
 using namespace std;
 int main(int argc, char* argv[])
 {
-    char ip[] = "127.0.0.1";
-    char port[] = "5000";
 
-    BasicClient c(ip, port);
-    char req[1024] = "Hallo Welt";
+    char port[] = "5000";
+    char ip[] = "127.0.0.1";
+    //BasicClient c(argv[1], argv[2]);
+    BasicClient c(ip,port);
+    char req[1024];
     char ans[1024];
     char wahl;
     do {
@@ -27,8 +25,9 @@ int main(int argc, char* argv[])
         cin >> wahl;
         switch (wahl) {
         case 't': // req zusammenbauen
+            
             c.sendRequest(req, ans);
-            cout << ans;
+            cout << ans << "\n";
             break;
         default:;
 
@@ -36,5 +35,3 @@ int main(int argc, char* argv[])
     } while (wahl != 'e');
 }
 
-//ich bin ein kommentar
-//ich bin ein zweiterkommentar
