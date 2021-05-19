@@ -9,13 +9,17 @@ Abschätzung
 1 Tag
 
 Details:
-TCP/IP
 
-Nachrichtenformat 1
-Messagetype	Länge RaumID SensorID Wert	Checksum
-				  int32	 int32	  int32	int32
-			Länge Payload				Checksum
-int8		int32 int8[]				int32
+Nachrichtenformat
+
+w/r (1char) raum#(3chars) sensortyp(2char) sensor#(3char)  wert(2 chars, 2 chars) (für read und write)
+e errormsg (<=1023 chars)
+m msgdata(<=1023 chars)
+l raum#(3chars) //anfrage
+l logdata (<=1023 chars) //antwort für später
+
+ops w - write  r - read e - error l - log m - message an client
+
 
 			
 
