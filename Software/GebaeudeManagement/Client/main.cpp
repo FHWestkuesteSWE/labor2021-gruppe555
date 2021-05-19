@@ -2,6 +2,7 @@
 #include <string>
 #include "BasicClient.h"
 #include "request.h"
+#include <random>
 
 
 using namespace std;

@@ -20,7 +20,11 @@ void BasicClient::sendRequest(const char request[], char answer[]) {
 
 	size_t reply_length = boost::asio::read(s,
 		boost::asio::buffer(answer, max_length));
-}
-BasicClient::~BasicClient() {
+
+	
 
 }
+BasicClient::~BasicClient() {
+	
+}
+

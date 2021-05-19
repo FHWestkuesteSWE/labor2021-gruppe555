@@ -9,9 +9,14 @@ using boost::asio::ip::tcp;
 class BasicClient
 {
 public:
+
+
 	BasicClient(char server[], char port[]);
-	void sendRequest(const char request[], char answer[]);
 	~BasicClient();
+	void sendRequest(const char request[], char answer[]);
+
+
+
 protected:
 	
 	static const int max_length=1024;
