@@ -14,13 +14,13 @@ int main(int argc, char* argv[])
     char wahl;
     do {
         std::cout << "Gebauedeleitsystem FHW 3000\n";
-        cout << "Was wollen Sie tun: " << endl;
-        cout << "----------------------------------------------------" << endl;
-        cout << "Aktuelle Raumtemperatur ueberpruefen \t(t)" << endl;
-        cout << "Aussentueren oeffnen / schliessen \t(a)" << endl;
-        cout << "..." << endl;
-        cout << "Beenden \t\t\t\t(e)" << endl;
-        cout << "----------------------------------------------------" << endl;
+        cout << "Was wollen Sie tun: " << "\n";
+        cout << "----------------------------------------------------" << "\n";
+        cout << "Aktuelle Raumtemperatur ueberpruefen \t(t)" << "\n";
+        cout << "Aussentueren oeffnen / schliessen \t(a)" << "\n";
+        cout << "..." << "\n";
+        cout << "Beenden \t\t\t\t(e)" << "\n";
+        cout << "----------------------------------------------------" <<"\n";
         cout << "Ihre Wahl: ";
         cin >> wahl;
         switch (wahl) {
