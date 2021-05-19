@@ -20,8 +20,9 @@ l logdata (<=1023 chars) //antwort für später
 
 ops w - write  r - read e - error l - log m - message an client
 
-
-			
+Änderungsvorschlag|19.05 von Dix:
+nach dem ops eine messageID oder message# (8chars) -> 100.000.000 Nachrichten bis überlauf 
+Ermöglicht dem Client das zuordnen der Abfragen zu Antworten vom Server
 
 
 
