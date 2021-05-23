@@ -63,7 +63,7 @@ int request::createreq(char wahl) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto wrtemp;
 		}
-		m1->setopcode(input.data());
+		m1->setopcode(input[0]);
 		input.clear();
 
 		troom:
@@ -81,7 +81,7 @@ int request::createreq(char wahl) {
 		m1->setsensort("t");
 
 
-	tsensn:
+		tsensn:
 		cout << "Welche Sensornumer?(###): " << "\n";
 		cin >> input;
 		if (input.length() > 3) {
@@ -91,7 +91,7 @@ int request::createreq(char wahl) {
 		m1->setsensornmr(input.data());
 		input.clear();
 
-	twert:
+		twert:
 		cout << "Auf welchen Wert?(##,##): " << "\n";
 		cin >> input;
 		if (input.length() > 5) {
@@ -101,6 +101,8 @@ int request::createreq(char wahl) {
 		input.erase(3, 1);
 		m1->setwert(input.data());
 		input.clear();
+
+		m1->makemsg();
 
 		_m.push_back(m1);
 		
@@ -115,4 +117,61 @@ int request::createreq(char wahl) {
 		return -1;
 	}
 
+}
+
+
+
+/*
+Desc: 
+	
+@param 
+@return 
+*/
+
+int request::setreqtype(char k) {
+
+
+	
+	return 0;
+}
+
+
+/*
+Desc: setdone -> set the done marker
+
+@param bool k
+@return none
+*/
+
+void request::setdone(bool k) {
+
+	done = k;
+
+}
+
+/*
+Desc: getdone -> get the done marker
+
+@param none
+@return done
+*/
+
+bool request::getdone() {
+
+	return done;
+
+}
+
+/*
+Desc: setdone -> set the done marker
+
+@param bool k
+@return none
+*/
+
+bool request::isdone() {
+
+	delete this;	//love this getto way of deleting stuff
+
+	return true;
 }

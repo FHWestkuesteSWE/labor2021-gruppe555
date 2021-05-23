@@ -13,7 +13,7 @@ public:
 	~message();														//Destrucotr
 
 
-	bool setopcode(const char[]);
+	bool setopcode(const char);
 	bool setmessageid(const char[]);
 	bool setraum(const char[]);
 	bool setsensort(const char[]);
@@ -40,9 +40,11 @@ private:
 
 	//Payload
 	char payload[MESSAGELENGTH-1];
+	int messageid_as_int;
+
+public:
 	char msg[MESSAGELENGTH];
 
-	int messageid_as_int;
 
 };
 

@@ -21,18 +21,18 @@ public:
 	bool setreqid();
 	int getreqid();
 
+	void setdone(bool);
+	bool getdone();
+
+	bool isdone();
+
 private:
-	char req[MESSAGELENGTH];
-	char ant[MESSAGELENGTH];
 
+	bool done;
 	char wahl;
-
 	int reqid;		//reqid = messageid;
 
-
-
 protected:
-
 
 };
 

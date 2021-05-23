@@ -1,8 +1,11 @@
 #include <iostream>
 #include <string>
-#include "BasicClient.h"
+//#include "BasicClient.h"
+#include "AdvancedClient.h"
 #include "request.h"
 #include <random>
+#include <memory>
+#include <vector>
 
 
 using namespace std;
@@ -11,12 +14,30 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 
+    boost::asio::io_context io_context;
+    tcp::resolver r(io_context);
+
+
+
+
     char port[] = "5000";
     char ip[] = "127.0.0.1";
+
+
+    AdvancedClient _c(io_context);
+
+    _c.start(r.resolve(ip, port));
+
+
     //BasicClient c(argv[1], argv[2]);
-    BasicClient c(ip,port);
-    //char req[1024];
-    //char ans[1024];
+    //BasicClient c(ip,port);
+
+
+
+
+
+
+
     char wahl;
     do {
         std::cout << "Gebauedeleitsystem FHW 3000\n";
@@ -36,6 +57,10 @@ int main(int argc, char* argv[])
                 request* n1 = new request();
 
                 n1->createreq('t');
+
+                std::shared_ptr<message> msg1(n1->_m.front());
+
+                _c.start_write(msg1->msg);
 
                 delete n1;
                 //c.sendRequest(req, ans);
