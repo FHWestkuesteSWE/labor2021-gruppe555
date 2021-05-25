@@ -3,6 +3,7 @@
 //#include "BasicClient.h"
 #include "AdvancedClient.h"
 #include "request.h"
+#include "RequestHandler.h"
 #include <random>
 #include <memory>
 #include <vector>
@@ -18,8 +19,6 @@ int main(int argc, char* argv[])
     tcp::resolver r(io_context);
 
 
-
-
     char port[] = "5000";
     char ip[] = "127.0.0.1";
 
@@ -28,15 +27,9 @@ int main(int argc, char* argv[])
 
     _c.start(r.resolve(ip, port));
 
-
-    //BasicClient c(argv[1], argv[2]);
-    //BasicClient c(ip,port);
-
-
-
-
-
-
+    
+    RequestHandler _h;
+    
 
     char wahl;
     do {
@@ -52,19 +45,30 @@ int main(int argc, char* argv[])
         cout << "Ihre Wahl: ";
         cin >> wahl;
         switch (wahl) {
-            case 't': { // req zusammenbauen
+            case 't': { // Temp
+                int l = 0;
+                l = _h.createnew('t');
+                request* now = _h.getreq(l);
+                _c.start_write(now->getmsg(0));
+         
 
-                request* n1 = new request();
+                break;
+            }
+            case 'r': { // Rollladen
+                int l = 0;
+                l = _h.createnew('r');
+                request* now = _h.getreq(l);
+                _c.start_write(now->getmsg(0));
 
-                n1->createreq('t');
 
-                std::shared_ptr<message> msg1(n1->_m.front());
 
-                _c.start_write(msg1->msg);
+                break;
+            }
+            case 'l': { // Logdaten
 
-                delete n1;
-                //c.sendRequest(req, ans);
-                //cout << ans << "\n";
+
+
+
                 break;
             }
             default: {
@@ -74,7 +78,10 @@ int main(int argc, char* argv[])
         }
     } while (wahl != 'e');
 
-    //cleanup();
+
+
+    _h.cleanup();
+
     return 0;
 }
 
@@ -83,10 +90,8 @@ int main(int argc, char* argv[])
 
 /*
 TODO:
--Client Async mit callback
--message zusammenfügen
--zweiten requesttyp
--cleanup
--vector<shared_ptr<request>> _r;
+-async recieve testen
+-zweiten + dritten requesttyp
+
 
 */

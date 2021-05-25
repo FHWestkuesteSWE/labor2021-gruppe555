@@ -1,24 +1,23 @@
 #pragma once
 #define MESSAGELENGTH 1024
 
+#include <string>
+
+using namespace std;
+
 class message
 {
 public:
 	message();														//Standartkonstrutor
-	message(char,int);													//Nur OPCode Message
-	message(char[]);												//Custom Message
-	message(char, char[8], char[3], char[2], char[3], char[4]);		//Datenabfrage oder Datenvorgabe
-	message(char, char[]);											//Error oder Normale Message
-
 	~message();														//Destrucotr
 
 
-	bool setopcode(const char);
-	bool setmessageid(const char[]);
-	bool setraum(const char[]);
-	bool setsensort(const char[]);
-	bool setsensornmr(const char[]);
-	bool setwert(const char[]);
+	bool setopcode(string);
+	bool setmessageid(string);
+	bool setraum(string);
+	bool setsensort(string);
+	bool setsensornmr(string);
+	bool setwert(string);
 	//bool setcustommsgpayload(const char []);
 
 	bool convertmid();
@@ -29,12 +28,12 @@ public:
 private:
 
 	// Message Typ0 def
-	char opcode;
-	char messageid[8];
-	char raum[3];
-	char sensort[2];
-	char sensornmr[3];
-	char wert[4];
+	string opcode;
+	string messageid;
+	string raum;
+	string sensort;
+	string sensornmr;
+	string wert;
 
 	int type;	//MessageType
 
@@ -43,7 +42,8 @@ private:
 	int messageid_as_int;
 
 public:
-	char msg[MESSAGELENGTH];
+	char msg_as_c[MESSAGELENGTH];
+	string msg_as_s;
 
 
 };

@@ -1,6 +1,7 @@
 #include "request.h"
 #include <iostream>
 #include <string>
+#include <regex>
 
 using namespace std;
 
@@ -49,32 +50,43 @@ int request::createreq(char wahl) {
 
 
 
-
-
 	if (wahl == 't') {
 		std::shared_ptr<message> m1(new message);
 		string input;
+		bool sw=false;
 
+		//Setzen oder lesen
+
+		
 
 		wrtemp:
 		cout << "Raumtemperatur setzen oder lesen(w/r): " << "\n";
 		cin >> input;
-		if (input.compare("w")||input.compare("r") == 0) {
+		if ((input.compare("w") != 0) && (input.compare("r") != 0)) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto wrtemp;
 		}
-		m1->setopcode(input[0]);
+		if (input.compare("w") != 0) {
+			sw = true;
+		}
+		m1->setopcode(input);
 		input.clear();
+
+
+		//Raum
+		regex rraum("[0-9]{3}");
 
 		troom:
 		cout << "In welchem Raum?(###): " << "\n";
 		cin >> input;
-		if (input.length() > 3) {
+		if (regex_match(input.substr(0,3), rraum)) {
+			m1->setraum(input);
+			input.clear();
+		}else{
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto troom;
 		}
-		m1->setraum(input.data());
-		input.clear();
+
 
 		
 		//welcher sensor wurde schon bestimmt t -> temp
@@ -88,23 +100,33 @@ int request::createreq(char wahl) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto tsensn;
 		}
-		m1->setsensornmr(input.data());
+		m1->setsensornmr(input);
 		input.clear();
 
-		twert:
-		cout << "Auf welchen Wert?(##,##): " << "\n";
-		cin >> input;
-		if (input.length() > 5) {
-			cout << "Falsche Eingabe erkannt!" << "\n";
-			goto twert;
+
+		if (sw == true) {
+
+			twert:
+			cout << "Auf welchen Wert?(##,##): " << "\n";
+			cin >> input;
+			if (input.length() > 5) {
+				cout << "Falsche Eingabe erkannt!" << "\n";
+				goto twert;
+			}
+			input.erase(2, 1);
+			m1->setwert(input);
+			input.clear();
+
 		}
-		input.erase(3, 1);
-		m1->setwert(input.data());
-		input.clear();
+
+		//TODO: messageid
+
 
 		m1->makemsg();
 
 		_m.push_back(m1);
+
+		return true;
 		
 	}
 	else if (wahl == 'r') {
@@ -174,4 +196,37 @@ bool request::isdone() {
 	delete this;	//love this getto way of deleting stuff
 
 	return true;
+}
+
+
+
+
+bool request::setreqid(int k) {
+
+	reqid = k;
+
+	return true;
+}
+int request::getreqid() {
+
+	return reqid;
+}
+
+
+string request::getmsg(int n) {
+
+
+
+	string out;
+	std::shared_ptr<message> m;
+
+	//if (_m.size() >= n) {
+		m = _m[n];
+		out = m->msg_as_s;
+	//}
+
+
+
+	m.reset();
+	return out;
 }

@@ -1,5 +1,7 @@
 #define MESSAGELENGTH 1024
 
+#pragma once
+
 #include <vector>
 #include <memory>
 #include "message.h"
@@ -12,13 +14,14 @@ public:
 	~request();
 
 	int createreq(char wahl);
+
 	int setreqtype(char);
 
 	std::vector<std::shared_ptr<message>> _m;
 
+	string getmsg(int);
 
-
-	bool setreqid();
+	bool setreqid(int);
 	int getreqid();
 
 	void setdone(bool);
@@ -30,7 +33,7 @@ private:
 
 	bool done;
 	char wahl;
-	int reqid;		//reqid = messageid;
+	int reqid;		//reqid = messageid ??
 
 protected:
 

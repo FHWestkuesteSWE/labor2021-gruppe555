@@ -9,6 +9,7 @@
 #include <boost/asio/error.hpp>
 
 
+
 using boost::asio::steady_timer;
 using boost::asio::ip::tcp;
 
@@ -38,7 +39,7 @@ private:
     void handle_read(const boost::system::error_code& ec, std::size_t n);
     
 public:
-    void start_write(const char req[]);
+    void start_write(std::string req);
 
 private:
     void handle_write(const boost::system::error_code & ec);

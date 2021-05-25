@@ -148,7 +148,7 @@ void AdvancedClient::handle_read(const boost::system::error_code& ec, std::size_
     }
 }
 
-void AdvancedClient::start_write(const char req[])
+void AdvancedClient::start_write(std::string req)
 {
     if (stopped_)
         return;
