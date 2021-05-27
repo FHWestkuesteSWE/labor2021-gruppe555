@@ -1,0 +1,1 @@
+Zeitstempel // OPCode // Raum_Idx // Sensor_Type // Sensor_Idx // Value 
