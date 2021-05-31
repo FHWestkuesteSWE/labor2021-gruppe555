@@ -1,5 +1,7 @@
 #include "Unittests.h"
 
+#ifdef UNITTEST
+
 void Unittests::request_response_test(BasicServer* server)
 {
 	char response[1024] = {};
@@ -62,3 +64,5 @@ void Unittests::request_response_test(BasicServer* server)
 		std::cout << response << std::endl;
 	}
 }
+
+#endif
