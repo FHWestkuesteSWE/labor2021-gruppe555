@@ -116,7 +116,7 @@ void AdvancedClient::start_read()
 
     // Start an asynchronous operation to read a newline-delimited message.
     boost::asio::async_read_until(socket_,
-        boost::asio::dynamic_buffer(input_buffer_), '\n',
+        boost::asio::dynamic_buffer(input_buffer_), '\0',
         boost::bind(&AdvancedClient::handle_read, this,
             boost::placeholders::_1, boost::placeholders::_2));
 }
