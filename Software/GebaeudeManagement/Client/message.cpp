@@ -81,7 +81,7 @@ bool message::makemsg() {
 	msg_as_s += sensort;
 	msg_as_s += sensornmr;
 	msg_as_s += wert;
-	msg_as_s += '\n';
+	msg_as_s += '\0';
 
 
 	strncpy_s(msg_as_c, 1024, msg_as_s.c_str(),sizeof(msg_as_s.c_str()));
