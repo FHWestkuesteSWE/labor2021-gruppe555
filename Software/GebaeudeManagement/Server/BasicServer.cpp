@@ -1,155 +1,256 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "BasicServer.h"
-#include <cstdlib>
-#include <iostream>
-#include <algorithm>
-#include <boost/thread/thread.hpp>
-#include <boost/bind.hpp>
-#include <fstream>
-#include <list>
-#include <ctime>
 
-void BasicServer::session(socket_ptr sock)
+
+static bool client_accepted = false;
+
+void BasicServer::session()
 {
+	boost::asio::ip::tcp::socket* mysock = sockets.back();
+	bool* mycallback = &thread_callbacks.back();
+	*mycallback = true;
+	char silentmsg[1] = { '\0' };
+
+	std::mutex mux;
+	std::unique_lock<std::mutex> ul(mux);
+	std::condition_variable cv;
+
 	try
 	{
-		for (;;)
-		{
+		for (;;) {
 			char request[BasicServer::max_length];
 			char answer[BasicServer::max_length];
 			boost::system::error_code error;
-			size_t length = sock->read_some(boost::asio::buffer(request), error);
-			if (error == boost::asio::error::eof)
-				break; // Connection closed cleanly by peer.
-			else if (error)
-				throw boost::system::system_error(error); // Some other error.
-			this->processRequest(request,answer, sock);
-			boost::asio::write(*sock, boost::asio::buffer(boost::asio::buffer(answer), max_length));
+			if (mysock->available() != 0) {
+				mysock->read_some(boost::asio::buffer(request), error);
+				if (error == boost::asio::error::eof) break; // Connection closed cleanly by peer.
+				if (error) throw boost::system::system_error(error); // Some other error.
+				processRequest(request, answer, mysock);
+				boost::asio::write(*mysock, boost::asio::buffer(boost::asio::buffer(answer), strlen(answer)));
+			}
+			boost::asio::write(*mysock, boost::asio::buffer(boost::asio::buffer(silentmsg), 1));
+			if (this->end_flag) break;
+			cv.wait_for(ul, std::chrono::milliseconds(50));
 		}
+		*mycallback = false;
+		return;
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << "Exception in thread: " << e.what() << "\n";
+		//W --> Ping Test failed --> Client gone
+		if(e.what()[0] != 'w') std::cerr << "Exception in thread: " << " " << e.what() << "\n";
+		*mycallback = false;
+		return;
 	}
 }
-BasicServer::BasicServer()
+
+void BasicServer::clear_up_lists()
 {
+	int place = 0;
+	for (auto it = thread_callbacks.begin(); it != thread_callbacks.end(); it++) {
+		if ((*it) == false) {
+			//Thread beendet
+			auto thread_it = threads.begin();
+			auto socket_it = sockets.begin();
+			std::advance(thread_it, place);
+			std::advance(socket_it, place);
+			
+			(*thread_it)->join();
+			delete (*thread_it);
+			delete (*socket_it);
 
-}
+			thread_callbacks.erase(it);
+			threads.erase(thread_it);
+			sockets.erase(socket_it);
 
-void BasicServer::start(int port) {
-	boost::asio::io_service io_service;
-
-	using namespace std; // For atoi.
-	using boost::asio::ip::tcp;
-	tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), port));
-	for (;;)
-	{
-		socket_ptr sock(new tcp::socket(io_service));
-		a.accept(*sock);
-		boost::thread t(boost::bind(&BasicServer::session, this, sock));
+			std::cout << "ASIO: Client removed \n";
+			return;
+		}
+		place++;
 	}
 }
 
-void BasicServer::processRequest(char req[], char ans[], socket_ptr sock) {
-	std::string reply;
-	unsigned int raum_id = 0, object_type = 0, object_id = 0;
-	float wert = 0.0f;
-	std::string raum_id_txt, object_type_txt, object_id_txt;
-	std::string wert1, wert2;
+void BasicServer::asio_callback(const boost::system::error_code& ec)
+{
+	if (!ec) {
+		std::cout << "ASIO: Client accepted" << std::endl;
+		client_accepted = true;
+	}
+	else {
+		std::cout << "ASIO Error: " << ec.message() << std::endl;
+	}
+	
+}
 
+BasicServer::BasicServer(int port)
+{
+	this->a = new boost::asio::ip::tcp::tcp::acceptor(io_service, boost::asio::ip::tcp::tcp::endpoint(boost::asio::ip::tcp::tcp::v4(), port));
+	this->sockets.push_back(new boost::asio::ip::tcp::socket(io_service));
+	this->a->async_accept(*sockets.front(), asio_callback);
+}
+
+void BasicServer::update() {
+	
+	try {
+		if (client_accepted) {
+			thread_callbacks.push_back(false);
+			threads.push_back(new std::thread(&BasicServer::session, this));
+			while (!thread_callbacks.back());
+
+			this->sockets.push_back(new boost::asio::ip::tcp::socket(io_service));
+			client_accepted = false;
+			this->a->async_accept(*sockets.back(), asio_callback);
+		}
+		this->clear_up_lists();
+		this->io_service.run_for(std::chrono::milliseconds(30));
+	}
+	catch (std::exception& e) {
+		std::cout << e.what();
+	}
+}
+
+void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::socket* sock) {
+	std::string reply;
 	time_t rawtime;
 	time(&rawtime);
 	std::string zeitstempel = asctime(localtime(&rawtime));
 
-	if (req[0] == 'w' || req[0] == 'r') {
-		raum_id_txt = req[1] + req[2] + req[3];
-		object_type_txt = req[4] + req[5];
-		object_id_txt = req[6] + req[7] + req[8];
-
-		raum_id = atoi(raum_id_txt.c_str());
-		object_type = atoi(object_type_txt.c_str());
-		object_id = atoi(object_id_txt.c_str());
-
-		if (req[0] == 'w') {
-			wert1 = req[9] + req[10];
-			wert2 = req[11] + req[11];
-			wert = atoi(wert1.c_str()) + atoi(wert2.c_str()) * 0.01f;
-		}
+	int endl_pos;
+	for (endl_pos = 0; endl_pos < this->max_length; endl_pos++) {
+		if (req[endl_pos] == '\0') break;
 	}
-	else if (req[0] == 'l') {
-		raum_id_txt = req[1] + req[2] + req[3];
-		raum_id = atoi(raum_id_txt.c_str());
+	if (req[endl_pos] != '\0') {
+		//No endl bit
+		reply = "eNo EndlBit in Message";
+		req[0] = 'e';
 	}
+
+	void *buf_ptr = nullptr;
+	InstructionBufferData* data_ptr = nullptr;
+
+	switch (req[0]) {
+	case 'r': buf_ptr = new InstructionBuffer(req); 
+			  data_ptr = new InstructionBufferData(); 
+			  *data_ptr = *(InstructionBuffer*)buf_ptr; break;
+	case 'w': buf_ptr = new InstructionBuffer(req); 
+			  data_ptr = new InstructionBufferData(); 
+			  *data_ptr = *(InstructionBuffer*)buf_ptr; break;
+	case 'l': buf_ptr = new InstructionBuffer(req); 
+			  data_ptr = new InstructionBufferData(); 
+			  *data_ptr = *(InstructionBuffer*)buf_ptr; break;
+	case 'm': buf_ptr = new MsgBuffer(req); break;
+	case 'e': buf_ptr = new MsgBuffer(req); break;
+	}
+
+	InstructionBuffer* txt_ptr = (InstructionBuffer*)buf_ptr;
 
 	switch (req[0]) {
 	case 'w': //Write to Component
-		if (raum_id > 0 && raum_id <= this->vec_raum.size()) {
-			//Raum valid
-			int object_cnt = 0, i = 0;
-			for (; i < vec_raum[raum_id-1].aktoren.size(); i++) {
-				if (vec_raum[raum_id-1].aktoren[i].get_aktor_type() == object_type) object_cnt++;
-				if (object_cnt == object_id) break;
+		if (data_ptr->raum_id > 0) {
+			int raum_it = -1;
+			for (int i = 0; i < vec_raum.size(); i++) {
+				if (vec_raum[i].get_raum_id() == data_ptr->raum_id) {
+					raum_it = i;
+					break;
+				}
 			}
+			if (raum_it != -1) {
+				//Raum valid
+				if (data_ptr->obj_id == 0) {
+					reply = "eObjektID darf nicht null sein."; break;
+				}
 
-			if (object_cnt != object_id) {
-				reply = "eAktor konnte nicht gefunden werden.";  break;
-			}
+				int object_cnt = 0, aktor_it = -1;
+				for (int i = 0; i < vec_raum[raum_it].aktoren.size(); i++) {
+					if (vec_raum[raum_it].aktoren[i].get_aktor_type() == data_ptr->obj_type) object_cnt++;
+					if (object_cnt == data_ptr->obj_id) {
+						//Aktor valid
+						aktor_it = i;
+						break;
+					}
+				}
 
-			std::string logmsg = zeitstempel + " " + req[0] + " " + raum_id_txt + " " + object_type_txt
-				+ " " + object_id_txt + " " + wert1 + "." + wert2;
-			std::ofstream f("logRaum" + raum_id_txt + ".txt");
+				if (object_cnt != data_ptr->obj_id || aktor_it == -1) {
+					reply = "eAktor konnte nicht gefunden werden.";  break;
+				}
 
-			if (vec_raum[raum_id - 1].aktoren[i].set_aktor_value(wert)) {
-				reply = "mAktorwert erfolgreich gesetzt.";
+				std::string logmsg = zeitstempel + " " + req[0] + " " + txt_ptr->txt_raum_id + " " + txt_ptr->txt_obj_type
+					+ " " + txt_ptr->txt_obj_id + " " + txt_ptr->txt_value;
+				std::string logPfad = "logRaum" + txt_ptr->txt_raum_id[0] + txt_ptr->txt_raum_id[1] + txt_ptr->txt_raum_id[2];
+				logPfad += ".txt";
+				std::ofstream f(logPfad.c_str());
+
+				if (vec_raum[raum_it].aktoren[aktor_it].set_aktor_value(data_ptr->value)) {
+					reply = "mAktorwert erfolgreich gesetzt.";
+				}
+				else {
+					reply = "eAktorwert konnte nicht gesetzt werden.";
+					logmsg += " Error: no exec";
+				}
+				f.write(logmsg.c_str(), logmsg.size());
+				f.close();
 			}
 			else {
-				reply = "eAktorwert konnte nicht gesetzt werden.";
-				logmsg += " Error: no exec";
+				reply = "eRaum nicht vorhanden.";
 			}
-			f.write(logmsg.c_str(), logmsg.size());
-			f.close();
 		} 
 		else {
 			reply = "eRaum nicht vorhanden.";
 		}
 		break;
 	case 'r': //Read from Component
-		if (raum_id > 0 && raum_id <= this->vec_raum.size()) {
-			//Raum valid
-			int object_cnt = 0, i = 0;
-			for (; i < vec_raum[raum_id-1].sensoren.size(); i++) {
-				if (vec_raum[raum_id-1].sensoren[i].get_sensor_type() == object_type) object_cnt++;
-				if (object_cnt == object_id) break;
+		if (data_ptr->raum_id > 0) {
+			int raum_it = -1;
+			for (int i = 0; i < vec_raum.size(); i++) {
+				if (vec_raum[i].get_raum_id() == data_ptr->raum_id) {
+					raum_it = i;
+					break;
+				}
 			}
+			if (raum_it != -1) {
+				//Raum valid
+				if (data_ptr->obj_id == 0) {
+					reply = "eObjektID darf nicht null sein."; break;
+				}
 
-			if (object_cnt != object_id) {
-				reply = "eSensor konnte nicht gefunden werden.";  break;
-			}
+				int object_cnt = 0, sensor_it = -1;
+				for (int i = 0; i < vec_raum[raum_it].sensoren.size(); i++) {
+					if (vec_raum[raum_it].sensoren[i].get_sensor_type() == data_ptr->obj_type) object_cnt++;
+					if (object_cnt == data_ptr->obj_id) {
+						sensor_it = i;
+						break;
+					}
+				}
 
-			float value = vec_raum[raum_id-1].sensoren[i].get_sensor_value();
-			char value_txt[5];
+				if (object_cnt != data_ptr->obj_id || sensor_it == -1) {
+					reply = "eSensor konnte nicht gefunden werden.";  break;
+				}
 
-			std::string logmsg = zeitstempel + " " + req[0] + " " + raum_id_txt + " " + object_type_txt
-				+ " " + object_id_txt + " ";
-			std::ofstream f("logRaum" + raum_id_txt + ".txt");
+				float value = vec_raum[raum_it].sensoren[sensor_it].get_sensor_value();
 
-			if(isfinite(value)) {
-				value_txt[0] = (int)floor((floor(value) / 10.0f)) + 48;
-				value_txt[1] = ((int)floor(value) % 10) + 48;
-				value_txt[2] = ((int)floor(10 * value) % 10) + 48;
-				value_txt[3] = ((int)floor(100 * value) % 10) + 48;
-				value_txt[4] = '\0';
+				std::string logmsg = zeitstempel + " " + req[0] + " " + txt_ptr->txt_raum_id + " " + txt_ptr->txt_obj_type
+					+ " " + txt_ptr->txt_obj_id + " ";
+				std::string logPfad = "logRaum" + txt_ptr->txt_raum_id[0] + txt_ptr->txt_raum_id[1] + txt_ptr->txt_raum_id[2];
+				logPfad += ".txt";
+				std::ofstream f(logPfad.c_str());
 
-				reply = "w" + raum_id_txt + object_type_txt + object_id_txt + value_txt;
-				logmsg += value_txt[0] + value_txt[1] + "." + value_txt[2] + value_txt[3];
-			}
+				if (isfinite(value)) {
+					data_ptr->value = value;
+					*txt_ptr = *data_ptr;
+
+					reply = (char*)txt_ptr;
+					logmsg += txt_ptr->txt_value;
+				}
+				else {
+					reply = "eSensorwert konnte nicht gelesen werden.";
+					logmsg += "Error: non valid Value.";
+				}
+				f.write(logmsg.c_str(), logmsg.size());
+				f.close();
+			} 
 			else {
-				reply = "eSensorwert konnte nicht gelesen werden.";
-				logmsg += "Error: non valid Value.";
+				reply = "eRaum nicht vorhanden.";
 			}
-			f.write(logmsg.c_str(), logmsg.size());
-			f.close();
 		}
 		else {
 			reply = "eRaum nicht vorhanden.";
@@ -158,31 +259,41 @@ void BasicServer::processRequest(char req[], char ans[], socket_ptr sock) {
 	case 'e': //Error from Client?
 		break;
 	case 'l': //Log Daten ausgeben
-		{std::string pfad = "logRaum" + req[1] + req[2] + req[3];
-		pfad += ".txt";
-		send_log_file(pfad.c_str(), sock);
-		break; }
+#ifndef UNITTEST
+	{std::string pfad = "logRaum" + txt_ptr->txt_raum_id[0] + txt_ptr->txt_raum_id[1] + txt_ptr->txt_raum_id[2];
+	pfad += ".txt";
+	if (!send_log_file(pfad.c_str(), sock)) reply = "eLogFile nicht vorhanden.";
+	break; }
+#endif // !UNITTEST
 	default:
 		reply = "eDatenmuell erhalten!";
 	}
-	strncpy(ans, reply.c_str(), std::min<int>(max_length, reply.size() + 1));
+	strncpy(ans, reply.c_str(), std::min<int>(max_length, (int)reply.size() + 1));
+
+	if (buf_ptr != nullptr) delete buf_ptr;
+	if (data_ptr != nullptr) delete data_ptr;
 }
 
-void BasicServer::send_log_file(const char log_file_path[], socket_ptr sock)
+bool BasicServer::send_log_file(const char log_file_path[], boost::asio::ip::tcp::socket* sock)
 {
 	std::ifstream f(log_file_path, std::ios::in | std::ios::binary);
 	if (!f.is_open()) {
 		std::cout << "LogFile not found: " << log_file_path << " \n";
-		return;
+		return false;
 	}
 	std::string line;
 	while (std::getline(f, line)) {
 		boost::asio::write(*sock, boost::asio::buffer(boost::asio::buffer(_strdup(line.c_str()), max_length)));
 	}
+	return true;
 }
 
 BasicServer::~BasicServer()
 {
+	delete this->a;
+	while (threads.size() != 0) {
+		this->clear_up_lists();
+	}
 }
 
 bool BasicServer::read_config(char path[])
@@ -252,3 +363,10 @@ bool BasicServer::read_config(char path[])
 	
 	return true;
 }
+
+#ifdef UNITTEST
+void BasicServer::testrequest(char* request, char* answer)
+{
+	this->processRequest(request, answer, nullptr);
+}
+#endif // !UNITTEST

@@ -3,7 +3,7 @@
 
 float DummySensor::get_sensor_value() 
 {
-	return g1();
+	return (float)g1();
 }
 
 unsigned int DummySensor::get_sensor_type()
