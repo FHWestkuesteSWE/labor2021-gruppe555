@@ -47,21 +47,21 @@ int main(int argc, char* argv[])
         switch (wahl) {
             case 't': { // Temp
                 int l = 0;
-                l = _h.createnew('t');
+                l = _h.createnew(wahl);
                 request* now = _h.getreq(l);
                 _c.start_write(now->getmsg(0));
          
-
+                
                 break;
             }
             case 'r': { // Rollladen
                 int l = 0;
-                l = _h.createnew('r');
+                l = _h.createnew(wahl);
                 request* now = _h.getreq(l);
                 _c.start_write(now->getmsg(0));
 
 
-
+                
                 break;
             }
             case 'l': { // Logdaten
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
                 break;
             }
             default: {
-
+                cout << "Kein Kommando erkannt. Bitte erneut versuchen! :)" << "\n";
             }
 
         }
@@ -92,6 +92,6 @@ int main(int argc, char* argv[])
 TODO:
 -async recieve testen
 -zweiten + dritten requesttyp
-
+-messageid
 
 */

@@ -90,13 +90,15 @@ int request::createreq(char wahl) {
 
 		
 		//welcher sensor wurde schon bestimmt t -> temp
-		m1->setsensort("t");
+		m1->setsensort("01");
 
+		//Sensors
+		regex rsens("[0-9]{3}");
 
 		tsensn:
 		cout << "Welche Sensornumer?(###): " << "\n";
 		cin >> input;
-		if (input.length() > 3) {
+		if (regex_match(input.substr(0, 3), rsens)) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto tsensn;
 		}
@@ -106,10 +108,13 @@ int request::createreq(char wahl) {
 
 		if (sw == true) {
 
+			//Wert
+			regex rwert("[0-9]{2},[0-9]{2}");
+
 			twert:
 			cout << "Auf welchen Wert?(##,##): " << "\n";
 			cin >> input;
-			if (input.length() > 5) {
+			if (regex_match(input.substr(0, 5), rwert)) {
 				cout << "Falsche Eingabe erkannt!" << "\n";
 				goto twert;
 			}

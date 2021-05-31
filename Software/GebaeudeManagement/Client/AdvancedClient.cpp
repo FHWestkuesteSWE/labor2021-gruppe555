@@ -114,7 +114,7 @@ void AdvancedClient::start_read()
     // Set a deadline for the read operation.
     deadline_.expires_after(boost::asio::chrono::hours(6));
 
-    // Start an asynchronous operation to read a newline-delimited message.
+    // Start an asynchronous operation to read a \0-delimited message.
     boost::asio::async_read_until(socket_,
         boost::asio::dynamic_buffer(input_buffer_), '\0',
         boost::bind(&AdvancedClient::handle_read, this,
