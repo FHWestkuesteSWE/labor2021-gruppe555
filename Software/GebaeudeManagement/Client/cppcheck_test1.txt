@@ -1,0 +1,68 @@
+C:\Program Files\Cppcheck>cppcheck.exe --enable=all C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\AdvancedClient.cpp ...
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\AdvancedClient.h:20:5: style: Class 'AdvancedClient' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+    AdvancedClient(boost::asio::io_context& io_context)
+    ^
+1/7 files checked 38% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\BasicClient.cpp ...
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\BasicClient.cpp:21:22: style: Variable 'reply_length' is assigned a value that is never used. [unreadVariable]
+ size_t reply_length = boost::asio::read(s,
+                     ^
+2/7 files checked 42% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\Client.cpp ...
+3/7 files checked 43% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\RequestHandler.cpp ...
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.h:13:2: style: Class 'request' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+ request(char);
+ ^
+4/7 files checked 46% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\main.cpp ...
+5/7 files checked 59% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp ...
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:37:32: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setopcode(string t) {
+                               ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:42:35: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setmessageid(string t) {
+                                  ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:47:30: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setraum(string t) {
+                             ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:52:33: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setsensort(string t) {
+                                ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:57:35: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setsensornmr(string t) {
+                                  ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:62:30: performance: Function parameter 't' should be passed by const reference. [passedByValue]
+bool message::setwert(string t) {
+                             ^
+6/7 files checked 67% done
+Checking C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp ...
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:38:10: warning: Member variable 'request::done' is not initialized in the constructor. [uninitMemberVar]
+request::request(char k) {
+         ^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:38:10: warning: Member variable 'request::reqid' is not initialized in the constructor. [uninitMemberVar]
+request::request(char k) {
+         ^
+7/7 files checked 100% done
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\message.cpp:72:0: style: The function 'convertmid' is never used. [unusedFunction]
+
+^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:290:0: style: The function 'getdone' is never used. [unusedFunction]
+
+^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:319:0: style: The function 'getreqid' is never used. [unusedFunction]
+
+^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:303:0: style: The function 'isdone' is never used. [unusedFunction]
+
+^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\BasicClient.cpp:8:0: style: The function 'sendRequest' is never used. [unusedFunction]
+
+^
+C:\Users\Dix\source\repos\labor2021-gruppe555\Software\GebaeudeManagement\Client\request.cpp:262:0: style: The function 'setreqtype' is never used. [unusedFunction]
+
+^
+nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
+
