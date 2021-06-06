@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <random>
 
 using namespace std;
 
@@ -47,6 +48,10 @@ Desc: Create Request and new Message and store pointer to first message in vecto
 */
 
 int request::createreq(char wahl) {
+
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> uni(0, 99999999);
 
 
 
@@ -124,7 +129,16 @@ int request::createreq(char wahl) {
 
 		}
 
-		//TODO: messageid
+
+		//messageid
+
+		string buf_mid("00000000");
+
+		auto random_integer = uni(rng);
+
+		buf_mid.insert(8 - sizeof(std::to_string(random_integer)),std::to_string(random_integer));
+
+		m1->setmessageid(buf_mid);
 
 
 		m1->makemsg();
@@ -136,11 +150,101 @@ int request::createreq(char wahl) {
 	}
 	else if (wahl == 'r') {
 		std::shared_ptr<message> m1(new message);
+		string input;
+		bool sw = false;
 
+		//Setzen oder lesen
+
+	wrroll:
+		cout << "Rollladen oeffnen/schließen oder Status lesen (w/r): " << "\n";
+		cin >> input;
+		if ((input.compare("w") != 0) && (input.compare("r") != 0)) {
+			cout << "Falsche Eingabe erkannt!" << "\n";
+			goto wrroll;
+		}
+		if (input.compare("w") != 0) {
+			sw = true;
+		}
+		m1->setopcode(input);
+		input.clear();
+
+
+		//Raum
+		regex rraum("[0-9]{3}");
+
+	rlroom:
+		cout << "In welchem Raum?(###): " << "\n";
+		cin >> input;
+		if (regex_match(input.substr(0, 3), rraum)) {
+			m1->setraum(input);
+			input.clear();
+		}
+		else {
+			cout << "Falsche Eingabe erkannt!" << "\n";
+			goto rlroom;
+		}
+
+
+
+		//welcher sensor wurde schon bestimmt t -> temp
+		m1->setsensort("02");
+
+		//Sensors
+		regex rsens("[0-9]{3}");
+
+	rlsensn:
+		cout << "Welche Rollladen?(###): " << "\n";
+		cin >> input;
+		if (regex_match(input.substr(0, 3), rsens)) {
+			cout << "Falsche Eingabe erkannt!" << "\n";
+			goto rlsensn;
+		}
+		m1->setsensornmr(input);
+		input.clear();
+
+
+		if (sw == true) {
+
+			//Wert
+			regex rwert("[0-9]{2},[0-9]{2}");
+
+		rlwert:
+			cout << "Auf welchen Wert?(##,##): " << "\n";
+			cin >> input;
+			if (regex_match(input.substr(0, 5), rwert)) {
+				cout << "Falsche Eingabe erkannt!" << "\n";
+				goto rlwert;
+			}
+			input.erase(2, 1);
+			m1->setwert(input);
+			input.clear();
+
+		}
+
+
+		//messageid
+
+		string buf_mid("00000000");
+
+		auto random_integer = uni(rng);
+
+		buf_mid.insert(8 - sizeof(std::to_string(random_integer)), std::to_string(random_integer));
+
+		m1->setmessageid(buf_mid);
+
+
+		m1->makemsg();
+
+		_m.push_back(m1);
+
+		return true;
 
 
 	}
-	else {
+	else if (wahl == 'l') {
+
+
+	}else{
 		return -1;
 	}
 
