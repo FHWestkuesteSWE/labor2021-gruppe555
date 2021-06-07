@@ -122,28 +122,36 @@ int request::createreq(char wahl) {
 			cout << "Auf welchen Wert?(##,##): " << "\n";
 			cin >> input;
 			if (regex_match(input.substr(0, 5), rwert)) {
+				input.erase(2, 1);
+				m1->setwert(input);
+				input.clear();
+			}else{
 				cout << "Falsche Eingabe erkannt!" << "\n";
 				goto twert;
 			}
-			input.erase(2, 1);
-			m1->setwert(input);
-			input.clear();
+
 
 		}
 
 
 		//messageid
 
-		string buf_mid("00000000");
+		
 
 		auto random_integer = uni(rng);
 
-		buf_mid.insert(8 - sizeof(std::to_string(random_integer)),std::to_string(random_integer));
+		int n_zero = 8;
+		string old_string;
 
-		m1->setmessageid(buf_mid);
+		old_string = to_string(random_integer);
 
+		std::string new_string = std::string(n_zero - old_string.length(), '0') + old_string;
+
+		m1->setmessageid(new_string);
 
 		m1->makemsg();
+
+		std::cout << m1->msg_as_s << "\n";
 
 		_m.push_back(m1);
 
@@ -216,12 +224,14 @@ int request::createreq(char wahl) {
 			cout << "Auf welchen Wert? 1/0 (##,##): " << "\n";
 			cin >> input;
 			if (regex_match(input.substr(0, 5), rwert)) {
+				input.erase(2, 1);
+				m1->setwert(input);
+				input.clear();
+			}else{
 				cout << "Falsche Eingabe erkannt!" << "\n";
 				goto rlwert;
 			}
-			input.erase(2, 1);
-			m1->setwert(input);
-			input.clear();
+
 
 		}
 
