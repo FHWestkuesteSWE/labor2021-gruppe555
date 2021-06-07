@@ -193,7 +193,7 @@ int request::createreq(char wahl) {
 		regex rsens("[0-9]{3}");
 
 	rlsensn:
-		cout << "Welche Rollladen?(###): " << "\n";
+		cout << "Welcher Rollladen?(###): " << "\n";
 		cin >> input;
 		if (regex_match(input.substr(0, 3), rsens)) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
@@ -206,10 +206,10 @@ int request::createreq(char wahl) {
 		if (sw == true) {
 
 			//Wert
-			regex rwert("[0-9]{2},[0-9]{2}");
+			regex rwert("[01]");
 
 		rlwert:
-			cout << "Auf welchen Wert?(##,##): " << "\n";
+			cout << "Auf welchen Wert? 1/0 (##,##): " << "\n";
 			cin >> input;
 			if (regex_match(input.substr(0, 5), rwert)) {
 				cout << "Falsche Eingabe erkannt!" << "\n";
