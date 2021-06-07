@@ -6,7 +6,7 @@ enum AktorTypes{Unknown = 0x00, Heizung = 0x01, FensterMotor = 0x02};
 class DummyAktor
 {
 public:
-	DummyAktor(enumAktorTypes type = Unknown);
+	DummyAktor(enumAktorTypes type = Heizung);
 	~DummyAktor();
 
 	unsigned int get_aktor_type();

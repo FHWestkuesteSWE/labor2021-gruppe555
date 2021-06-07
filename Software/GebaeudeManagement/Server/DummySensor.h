@@ -6,7 +6,7 @@ enum SensorTypes {Unbekannt = 0x00, TempSensor = 0x01, FensterKontakt = 0x02};
 class DummySensor {
 
 public:
-	DummySensor(enumSensorTypes type = 0, int seed = 12);
+	DummySensor(enumSensorTypes type = 1, int seed = 12);
 	~DummySensor();
 
 	float get_sensor_value(void);

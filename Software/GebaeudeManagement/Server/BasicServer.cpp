@@ -26,7 +26,7 @@ void BasicServer::session()
 				if (error == boost::asio::error::eof) break; // Connection closed cleanly by peer.
 				if (error) throw boost::system::system_error(error); // Some other error.
 				processRequest(request, answer, mysock);
-				boost::asio::write(*mysock, boost::asio::buffer(boost::asio::buffer(answer), strlen(answer)));
+				boost::asio::write(*mysock, boost::asio::buffer(boost::asio::buffer(answer), strlen(answer)+1));
 			}
 			boost::asio::write(*mysock, boost::asio::buffer(boost::asio::buffer(silentmsg), 1));
 			if (this->end_flag) break;
@@ -269,6 +269,7 @@ void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::soc
 		reply = "eDatenmuell erhalten!";
 	}
 	strncpy(ans, reply.c_str(), std::min<int>(max_length, (int)reply.size() + 1));
+	std::cout << reply << std::endl;
 
 	if (buf_ptr != nullptr) delete buf_ptr;
 	if (data_ptr != nullptr) delete data_ptr;
