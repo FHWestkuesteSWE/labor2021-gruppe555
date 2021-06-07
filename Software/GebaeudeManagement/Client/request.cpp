@@ -238,13 +238,18 @@ int request::createreq(char wahl) {
 
 		//messageid
 
-		string buf_mid("00000000");
+		
 
 		auto random_integer = uni(rng);
 
-		buf_mid.insert(8 - sizeof(std::to_string(random_integer)), std::to_string(random_integer));
+		int n_zero = 8;
+		string old_string;
 
-		m1->setmessageid(buf_mid);
+		old_string = to_string(random_integer);
+
+		std::string new_string = std::string(n_zero - old_string.length(), '0') + old_string;
+
+		m1->setmessageid(new_string);
 
 
 		m1->makemsg();
@@ -316,7 +321,7 @@ Desc: setdone -> set the done marker
 
 bool request::isdone() {
 
-	delete this;	//love this getto way of deleting stuff
+	delete this;	//love this ghetto way of deleting stuff
 
 	return true;
 }
