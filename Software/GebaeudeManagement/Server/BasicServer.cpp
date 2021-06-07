@@ -326,7 +326,7 @@ bool BasicServer::read_config(char path[])
 			for (int it = 0; it < 3; it++) list_data.push_back(std::atoi(substring[it].c_str()));
 		}
 	}
-	catch(std::exception e) {
+	catch(std::exception& e) {
 		std::cout << "Error in Config-File!" << std::endl;
 	}
 	f.close();
