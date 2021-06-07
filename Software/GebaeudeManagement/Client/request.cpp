@@ -71,7 +71,8 @@ int request::createreq(char wahl) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto wrtemp;
 		}
-		if (input.compare("w") != 0) {
+
+		if (input.compare("w") == true) {
 			sw = true;
 		}
 		m1->setopcode(input);
@@ -113,7 +114,7 @@ int request::createreq(char wahl) {
 
 
 
-		if (sw == false) {
+		if (sw == true) {
 
 			//Wert
 			regex rwert("[0-9]{2},[0-9]{2}");
@@ -171,7 +172,8 @@ int request::createreq(char wahl) {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto wrroll;
 		}
-		if (input.compare("w") != 0) {
+
+		if (input.compare("w") == true) {
 			sw = true;
 		}
 		m1->setopcode(input);
@@ -214,7 +216,7 @@ int request::createreq(char wahl) {
 		}
 
 
-		if (sw == false) {
+		if (sw == true) {
 
 			//Wert
 			regex rwert("[01]");
