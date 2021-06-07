@@ -151,7 +151,6 @@ int request::createreq(char wahl) {
 
 		m1->makemsg();
 
-		std::cout << m1->msg_as_s << "\n";
 
 		_m.push_back(m1);
 
