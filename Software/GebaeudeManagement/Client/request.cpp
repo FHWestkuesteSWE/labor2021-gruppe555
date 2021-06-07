@@ -72,7 +72,7 @@ int request::createreq(char wahl) {
 			goto wrtemp;
 		}
 
-		if (input.compare("w") == true) {
+		if (input.compare("w") == 0) {
 			sw = true;
 		}
 		m1->setopcode(input);
@@ -173,7 +173,7 @@ int request::createreq(char wahl) {
 			goto wrroll;
 		}
 
-		if (input.compare("w") == true) {
+		if (input.compare("w") == 0) {
 			sw = true;
 		}
 		m1->setopcode(input);
