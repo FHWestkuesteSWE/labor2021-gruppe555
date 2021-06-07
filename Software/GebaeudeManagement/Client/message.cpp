@@ -10,8 +10,15 @@ Desc: Constructor
 @return None
 */
 message::message() {
+	messageid_as_int = 0;
+	type = 0x00;
 
-
+	for (int i = 0; i < MESSAGELENGTH; i++) {
+		msg_as_c[i] = 0;
+	}
+	for (int i = 0; i < MESSAGELENGTH-1; i++) {
+		payload[i] = 0;
+	}
 
 }
 
