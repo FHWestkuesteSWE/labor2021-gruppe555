@@ -103,12 +103,14 @@ int request::createreq(char wahl) {
 		tsensn:
 		cout << "Welche Sensornumer?(###): " << "\n";
 		cin >> input;
-		if (regex_match(input.substr(0, 3), rsens)) {
+		if (regex_match(input.substr(0,3), rsens)) {
+			m1->setsensornmr(input);
+			input.clear();
+		}else{
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto tsensn;
 		}
-		m1->setsensornmr(input);
-		input.clear();
+
 
 
 		if (sw == true) {
@@ -196,11 +198,13 @@ int request::createreq(char wahl) {
 		cout << "Welcher Rollladen?(###): " << "\n";
 		cin >> input;
 		if (regex_match(input.substr(0, 3), rsens)) {
+			m1->setraum(input);
+			input.clear();
+		}
+		else {
 			cout << "Falsche Eingabe erkannt!" << "\n";
 			goto rlsensn;
 		}
-		m1->setsensornmr(input);
-		input.clear();
 
 
 		if (sw == true) {
