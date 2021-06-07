@@ -113,7 +113,7 @@ int request::createreq(char wahl) {
 
 
 
-		if (sw == true) {
+		if (sw == false) {
 
 			//Wert
 			regex rwert("[0-9]{2},[0-9]{2}");
@@ -214,16 +214,15 @@ int request::createreq(char wahl) {
 		}
 
 
-		if (sw == true) {
+		if (sw == false) {
 
 			//Wert
 			regex rwert("[01]");
 
 		rlwert:
-			cout << "Auf welchen Wert? 1/0 (##,##): " << "\n";
+			cout << "Auf welchen Wert? 1/0 (#): " << "\n";
 			cin >> input;
-			if (regex_match(input.substr(0, 5), rwert)) {
-				input.erase(2, 1);
+			if (regex_match(input.substr(0, 1), rwert)) {
 				m1->setwert(input);
 				input.clear();
 			}else{
