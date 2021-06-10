@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 class InstructionBufferData;
 
 class InstructionBuffer {
@@ -14,7 +16,10 @@ public:
 	char txt_value[4] = {0};
 	char endl_bit = '\0';
 
+	std::string get_raum();
+
 	InstructionBuffer& operator=(InstructionBufferData& rhs);
+	std::string operator()(void);
 };
 
 class InstructionBufferData {

@@ -114,6 +114,7 @@ void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::soc
 	time_t rawtime;
 	time(&rawtime);
 	std::string zeitstempel = asctime(localtime(&rawtime));
+	zeitstempel.resize(zeitstempel.length() - 1); //Zeilenumbruch am Ende verwerfen
 
 	int endl_pos;
 	for (endl_pos = 0; endl_pos < this->max_length; endl_pos++) {
@@ -174,11 +175,9 @@ void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::soc
 					reply = "eAktor konnte nicht gefunden werden.";  break;
 				}
 
-				std::string logmsg = zeitstempel + " " + req[0] + " " + txt_ptr->txt_raum_id + " " + txt_ptr->txt_obj_type
-					+ " " + txt_ptr->txt_obj_id + " " + txt_ptr->txt_value;
-				std::string logPfad = "logRaum" + txt_ptr->txt_raum_id[0] + txt_ptr->txt_raum_id[1] + txt_ptr->txt_raum_id[2];
-				logPfad += ".txt";
-				std::ofstream f(logPfad.c_str());
+				std::string logmsg = zeitstempel + " " + (*txt_ptr)();
+				std::string logPfad = "logRaum" + txt_ptr->get_raum() + ".txt";
+				std::ofstream f(logPfad.c_str(), std::ofstream::app);
 
 				if (vec_raum[raum_it].aktoren[aktor_it].set_aktor_value(data_ptr->value)) {
 					reply = "mAktorwert erfolgreich gesetzt.";
@@ -187,6 +186,7 @@ void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::soc
 					reply = "eAktorwert konnte nicht gesetzt werden.";
 					logmsg += " Error: no exec";
 				}
+				logmsg += '\n';
 				f.write(logmsg.c_str(), logmsg.size());
 				f.close();
 			}
@@ -228,23 +228,22 @@ void BasicServer::processRequest(char* req, char* ans, boost::asio::ip::tcp::soc
 
 				float value = vec_raum[raum_it].sensoren[sensor_it].get_sensor_value();
 
-				std::string logmsg = zeitstempel + " " + req[0] + " " + txt_ptr->txt_raum_id + " " + txt_ptr->txt_obj_type
-					+ " " + txt_ptr->txt_obj_id + " ";
-				std::string logPfad = "logRaum" + txt_ptr->txt_raum_id[0] + txt_ptr->txt_raum_id[1] + txt_ptr->txt_raum_id[2];
-				logPfad += ".txt";
-				std::ofstream f(logPfad.c_str());
+				std::string logmsg;
+				std::string logPfad = "logRaum" + txt_ptr->get_raum() + ".txt";
+				std::ofstream f(logPfad.c_str(), std::ofstream::app);
 
 				if (isfinite(value)) {
 					data_ptr->value = value;
 					*txt_ptr = *data_ptr;
 
 					reply = (char*)txt_ptr;
-					logmsg += txt_ptr->txt_value;
+					logmsg = zeitstempel + " " + (*txt_ptr)();
 				}
 				else {
 					reply = "eSensorwert konnte nicht gelesen werden.";
 					logmsg += "Error: non valid Value.";
 				}
+				logmsg += '\n';
 				f.write(logmsg.c_str(), logmsg.size());
 				f.close();
 			} 
@@ -354,7 +353,7 @@ bool BasicServer::read_config(char path[])
 		std::ifstream f(raum_pfad, std::ios::in | std::ios::binary);
 		if (!f.is_open()) {
 			fp = fopen(raum_pfad.c_str(), "w");
-			fprintf(fp, "Zeitstempel // OPCode // Raum_Idx // Sensor_Type // Sensor_Idx // Value \n");
+			fprintf(fp, "Zeitstempel // OPCode // MsgID // Raum_Idx // Sensor_Type // Sensor_Idx // Value \n");
 			fclose(fp);
 		}
 		else {

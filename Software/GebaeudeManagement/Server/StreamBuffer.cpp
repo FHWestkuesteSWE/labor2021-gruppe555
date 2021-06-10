@@ -6,7 +6,7 @@
 InstructionBuffer::InstructionBuffer(char* char_stream)
 {
 	int i = 0; 
-	while (char_stream[i] != '/0' && i != 22) i++;
+	while (char_stream[i] != '\0' && i != 22) i++;
 
 	if(i > 1) this->opcode = char_stream[0];
 	if(i > 8) std::memcpy(this->txt_msg_id, &char_stream[1], 8);
@@ -20,6 +20,15 @@ InstructionBuffer::~InstructionBuffer()
 {
 }
 
+std::string InstructionBuffer::get_raum()
+{
+	std::string temp;
+	temp = this->txt_raum_id[0];
+	temp += this->txt_raum_id[1];
+	temp += this->txt_raum_id[2];
+	return temp;
+}
+
 InstructionBuffer& InstructionBuffer::operator=(InstructionBufferData& rhs)
 {
 	this->opcode = rhs.opcode;
@@ -31,12 +40,21 @@ InstructionBuffer& InstructionBuffer::operator=(InstructionBufferData& rhs)
 	for (int i = 0; i < 2; i++) this->txt_obj_type[i] = ((rhs.obj_type / (int)pow(10, 1 - i)) % 10) + 48;
 	for (int i = 0; i < 3; i++) this->txt_obj_id[i] = ((rhs.obj_id / (int)pow(10, 2 - i)) % 10) + 48;
 	
-	int vorkomma = (int)floor(rhs.value);
-	int nachkomma = ((int)floor(rhs.value * 100)) % 100;
+	unsigned int vorkomma = (int)floor(rhs.value);
+	unsigned int nachkomma = ((int)floor(rhs.value * 100)) % 100;
 	
 	for (int i = 0; i < 2; i++) this->txt_value[i] = ((vorkomma / (int)pow(10, 1 - i)) % 10) + 48;
 	for (int i = 0; i < 2; i++) this->txt_value[i + 2] = ((nachkomma / (int)pow(10, 1 - i)) % 10) + 48;
 	return *this;
+}
+
+std::string InstructionBuffer::operator()(void)
+{
+	std::string temp;
+	for (int i = 0; i < sizeof(InstructionBuffer) - 1; i++) {
+		temp += ((char*)this)[i];
+	}
+	return temp;
 }
 
 InstructionBufferData::InstructionBufferData()
