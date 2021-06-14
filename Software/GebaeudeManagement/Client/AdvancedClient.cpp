@@ -43,6 +43,7 @@ void AdvancedClient::stop()
     socket_.close(ignored_ec);
     deadline_.cancel();
     heartbeat_timer_.cancel();
+    reqhandl.cleanup();
 }
 
 void AdvancedClient::start_connect(tcp::resolver::results_type::iterator endpoint_iter)
@@ -55,9 +56,12 @@ void AdvancedClient::start_connect(tcp::resolver::results_type::iterator endpoin
         deadline_.expires_after(boost::asio::chrono::seconds(60));
 
         // Start the asynchronous connect operation.
+        
         socket_.async_connect(endpoint_iter->endpoint(),
             boost::bind(&AdvancedClient::handle_connect, this,
                 boost::placeholders::_1, endpoint_iter));
+        
+
     }
     else
     {
@@ -69,6 +73,8 @@ void AdvancedClient::start_connect(tcp::resolver::results_type::iterator endpoin
 void AdvancedClient::handle_connect(const boost::system::error_code& ec,
     tcp::resolver::results_type::iterator endpoint_iter)
 {
+
+
     if (stopped_)
         return;
 
@@ -106,6 +112,7 @@ void AdvancedClient::handle_connect(const boost::system::error_code& ec,
 
         // Start the heartbeat actor.
         //start_write();
+        start_req();
     }
 }
 
@@ -148,6 +155,67 @@ void AdvancedClient::handle_read(const boost::system::error_code& ec, std::size_
     }
 }
 
+void AdvancedClient::start_req() {
+
+    char wahl;
+    do {
+        std::cout << "Gebauedeleitsystem FHW 3000\n";
+        cout << "Was wollen Sie tun: " << "\n";
+        cout << "----------------------------------------------------" << "\n";
+        cout << "Aktuelle Raumtemperatur ueberpruefen / setzen \t(t)" << "\n";
+        cout << "Rollladen oeffnen / schliessen \t(r)" << "\n";
+        cout << "LogDaten vom Server holen \t(l)" << "\n";
+        cout << "..." << "\n";
+        cout << "Beenden \t\t\t\t(e)" << "\n";
+        cout << "----------------------------------------------------" << "\n";
+        cout << "Ihre Wahl: ";
+        cin >> wahl;
+        switch (wahl) {
+        case 't': { // Temp
+            int l = 0;
+            l = reqhandl.createnew(wahl);
+            request* now = reqhandl.getreq(l);
+            start_write(now->getmsg(0));
+
+
+            break;
+        }
+        case 'r': { // Rollladen
+            int l = 0;
+            l = reqhandl.createnew(wahl);
+            request* now = reqhandl.getreq(l);
+            start_write(now->getmsg(0));
+
+
+
+            break;
+        }
+        case 'l': { // Logdaten
+
+
+
+
+            break;
+        }
+        case 'e': {
+            stop();
+        }
+
+        default: {
+            cout << "Kein Kommando erkannt. Bitte erneut versuchen! :)" << "\n";
+        }
+
+        }
+
+
+    } while (wahl != 'e');
+
+
+}
+
+
+
+
 void AdvancedClient::start_write(std::string req)
 {
     if (stopped_)
@@ -168,6 +236,7 @@ void AdvancedClient::handle_write(const boost::system::error_code& ec)
         // Wait 10 seconds before sending the next heartbeat.
         //heartbeat_timer_.expires_after(boost::asio::chrono::seconds(10));
         //heartbeat_timer_.async_wait(boost::bind(&AdvancedClient::start_write, this));
+        start_req();
     }
     else
     {

@@ -8,6 +8,10 @@
 #include <string>
 #include <boost/asio/error.hpp>
 
+#include "request.h"
+#include "RequestHandler.h"
+
+
 
 
 using boost::asio::steady_timer;
@@ -39,9 +43,10 @@ private:
     void handle_read(const boost::system::error_code& ec, std::size_t n);
     
 public:
-    void start_write(std::string req);
+    void start_req();
 
 private:
+    void start_write(std::string req);
     void handle_write(const boost::system::error_code & ec);
 
        
@@ -54,6 +59,12 @@ private:
     std::string input_buffer_;
     steady_timer deadline_;
     steady_timer heartbeat_timer_;
+
+
+
+private:
+
+    RequestHandler reqhandl;
 
 };
 
